@@ -1,132 +1,132 @@
-# NanoV3 – Device Benchmarks Summary
+# ZNano
 
-## Purpose
+**Lossless compression for embedded devices, telemetry, and constrained infrastructure.**
 
-This document provides a **high-level summary of NanoV3 benchmarks** performed on **real device payloads**.
+ZNano is Zetako's proprietary compression technology designed for structured device payloads where deterministic behavior, bounded resource usage, and byte-for-byte recovery matter more than headline benchmark numbers.
 
-The goal is to help engineers quickly understand:
-- what devices were tested
-- what kind of data was used
-- what guarantees NanoV3 provides
-- where to find detailed, reproducible results
+> This repository is a public technical showcase. The ZNano core implementation, release binaries, and proprietary source code are maintained privately.
 
-All benchmarks focus on **integration safety and predictability**, not synthetic performance claims.
+## What ZNano is built for
 
----
+ZNano targets environments such as:
 
-## Benchmark Methodology (Common to All Devices)
+- smart metering and utility telemetry
+- industrial and embedded devices
+- GNSS and positioning payloads
+- edge infrastructure
+- constrained links and low-bandwidth transports
 
-For every device listed below:
+The design goal is simple: reduce structured payload size while preserving exact reconstruction and predictable runtime behavior.
 
-- Real, production-like payloads were used
-- Payloads consist of **multiple concatenated frames**
-- Encode → decode was performed in **decode-all stream mode (`d 0`)**
-- Integrity verified via **SHA256 on normalized hex**
-- Performance measured over multiple runs (warmup excluded)
-- Memory usage analyzed via RSS peak and baseline delta
-- No entropy coding, no training, no external dictionaries
+## Engineering properties
 
-All results were generated using the same tool:
+- **Lossless** — decoded output is verified against the original payload.
+- **Deterministic** — the same input produces the same encoded representation and the same decoded output.
+- **Stream-safe** — supports concatenated multi-frame payloads.
+- **No training phase** — no model training is required before deployment.
+- **No external dictionary dependency** — integration does not rely on remotely managed dictionaries.
+- **Bounded implementation model** — designed for predictable memory use and embedded integration.
 
-nanov3_bench.py
+## Public benchmark set
 
-yaml
-Copy code
+The public repository currently documents validation on four production-like device families:
 
----
+| Device | Domain | Payload | Result |
+|---|---|---|---|
+| HYDRUS-F06-006-WATER | Water metering | Structured telemetry | ~31% reduction |
+| LANDIS+GYR E450 | Electricity metering | Structured telemetry | See report |
+| NEO-M8-FW3 | GNSS / positioning | GNSS telemetry | See report |
+| SHARKY-775-159 | Thermal energy metering | Heat-meter telemetry | See report |
 
-## Devices Tested
+Detailed reports:
 
-| Device | Domain | Payload Type | Lossless | Deterministic | Compression | Details |
-|------|-------|--------------|----------|---------------|-------------|---------|
-| HYDRUS-F06-006-WATER | Water metering | Structured telemetry | Yes | Yes | ~31% | [HYDRUS benchmark](BENCHMARKS_HYDRUS_F06_006_WATER.md) |
-| LANDIS+GYR E450 | Electricity metering | Structured telemetry | Yes | Yes | see report | [E450 benchmark](BENCHMARKS_LANDIS_GYR_E450.md) |
-| NEO-M8-FW3 | GNSS / positioning | GNSS telemetry | Yes | Yes | see report | [NEO-M8 benchmark](BENCHMARKS_NEO_M8_FW3.md) |
-| SHARKY-775-159 | Thermal energy metering | Heat meter telemetry | Yes | Yes | see report | [SHARKY benchmark](BENCHMARKS_SHARKY_775_159.md) |
+- [HYDRUS-F06-006-WATER](BENCHMARKS_HYDRUS_F06_006_WATER.md)
+- [LANDIS+GYR E450](BENCHMARKS_LANDIS_GYR_E450.md)
+- [NEO-M8-FW3](BENCHMARKS_NEO_M8_FW3.md)
+- [SHARKY-775-159](BENCHMARKS_SHARKY_775_159.md)
 
----
+## Benchmark methodology
 
-## What These Benchmarks Show
+Across the published device tests, the methodology focuses on integration safety rather than synthetic compression contests:
 
-Across all tested devices, NanoV3 demonstrates:
+1. use production-like structured payloads;
+2. encode the complete stream;
+3. decode the complete stream;
+4. verify normalized output integrity with SHA-256;
+5. measure repeated runtime after warm-up;
+6. inspect peak memory behavior and baseline overhead;
+7. report limitations alongside positive results.
 
-- **Lossless encode/decode** on real device data
-- Correct handling of **multi-payload streams**
-- **Deterministic runtime behavior** (low variance)
-- **Predictable CPU cost** (encode ≈ decode)
-- **Bounded and stable memory usage**
-- Practical compression gains on structured telemetry
+The published tests intentionally do **not** claim cycle-accurate MCU performance. Final cycle counts and memory requirements must be validated on the intended target hardware.
 
-These properties are critical for:
-- embedded systems
-- metering infrastructure
-- constrained or real-time environments
+## Example: HYDRUS validation
 
----
+The HYDRUS-F06-006-WATER benchmark demonstrates:
 
-## What These Benchmarks Do NOT Claim
+- complete lossless stream reconstruction;
+- SHA-256 integrity match;
+- approximately 31% size reduction on the tested payload;
+- low runtime variance in the host benchmark environment;
+- bounded memory behavior in the tested implementation.
 
-- Absolute MCU cycle counts
-- Maximum theoretical throughput
-- Direct comparison with gzip / zstd
-- Performance on synthetic or adversarial datasets
+See the [full HYDRUS report](BENCHMARKS_HYDRUS_F06_006_WATER.md) for methodology and interpretation.
 
-Cycle-accurate performance must be measured on **target hardware**.
+## Integration model
 
----
+ZNano is intended to sit close to the source of structured data:
 
-## Memory Usage Note (Important)
+```text
+Device / Sensor
+      |
+      v
++-------------+
+| ZNano Encode|
++-------------+
+      |
+      v
+Transport / Storage
+      |
+      v
++-------------+
+| ZNano Decode|
++-------------+
+      |
+      v
+Original Payload
+```
 
-Reported RSS values include:
-- OS loader
-- runtime / libc
-- CLI overhead
+The codec core is proprietary. Customer and evaluation releases are distributed separately from this public repository.
 
-For each benchmark, a **baseline RSS** was measured and subtracted to compute a **NanoV3 core RSS delta (upper bound)**.
+## What is public vs. private
 
-**MCU interpretation:**
-- No dynamic allocation
-- Fixed internal buffers
-- Deterministic stack usage
+**Public here**
 
-Expected MCU RAM usage is **order-of-magnitude tens of KB**, bounded by design.
-Exact values depend on the target MCU and caller-provided buffers.
+- benchmark methodology
+- benchmark reports
+- integration-oriented technical documentation
+- product behavior and engineering claims that can be externally reviewed
 
----
+**Private**
 
-## Reproducibility
+- compression core source code
+- release binaries
+- internal test harnesses and proprietary datasets
+- customer-specific integrations
+- release engineering and CI/CD
 
-For each device:
-- A dedicated Markdown file explains the results
-- A raw `.txt` report contains the full logs
+## Product naming
 
-Suggested repository layout:
+**ZNano** is the current product name. Earlier internal and benchmark material may refer to **NanoV3**; those references describe the same technology lineage.
 
-benchmarks/
-├─ BENCHMARKS.md
-├─ BENCHMARKS_HYDRUS_F06_006_WATER.md
-├─ BENCHMARKS_LANDIS_GYR_E450.md
-├─ BENCHMARKS_NEO_M8_FW3.md
-├─ BENCHMARKS_SHARKY_775_159.md
-├─ nanov3_bench_report_HYDRUS.txt
-├─ nanov3_bench_report_LANDIS_GYR_E450.txt
-├─ nanov3_bench_report_NEO-M8-FW3.txt
-└─ nanov3_bench_report_Sharky-775-159.txt
+## Commercial evaluation
 
-yaml
-Copy code
+For technical evaluation, licensing, or integration discussions:
 
----
-
-## Summary
-
-NanoV3 has been validated on **multiple real-world metering and telemetry devices**, demonstrating:
-
-- deterministic behavior
-- lossless stream reconstruction
-- bounded resource usage
-- meaningful compression on structured payloads
-
-These benchmarks are intended to support **engineering due diligence and safe system integration**.
+**Zetako S.à r.l.**  
+Luxembourg  
+https://zetako.ai/  
+contact@zetako.ai
 
 ---
+
+© Zetako. Proprietary technology. Public documentation in this repository does not grant rights to reproduce, reverse engineer, or redistribute the ZNano implementation.
