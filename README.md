@@ -1,131 +1,144 @@
 # ZNano
 
-**Lossless compression for embedded devices, telemetry, and constrained infrastructure.**
+**Proprietary lossless compression for structured telemetry, metering, and constrained embedded systems.**
 
-ZNano is Zetako's proprietary compression technology designed for structured device payloads where deterministic behavior, bounded resource usage, and byte-for-byte recovery matter more than headline benchmark numbers.
+> **ZNano** is the current product name. Earlier benchmark material may refer to **NanoV3**; both names belong to the same technology lineage.
 
-> This repository is a public technical showcase. The ZNano core implementation, release binaries, and proprietary source code are maintained privately.
+ZNano is built for structured device payloads where exact reconstruction, small implementation footprint, predictable integration behavior, and measurable bandwidth reduction matter. This repository is the **public technical showcase** for ZNano. The proprietary core source, protected releases, internal test tooling, and customer-specific integrations remain private.
 
-## What ZNano is built for
+## Verified public snapshot
 
-ZNano targets environments such as:
+| Metric | Current evidence |
+|---|---:|
+| SHA-verified structured rerun rows | **10 / 10 pass** |
+| SHA-verified incompressible control rows | **4 / 4 pass** |
+| Verified structured reduction range | **23.46% – 90.85%** |
+| Verified structured mean reduction | **56.32%** |
+| Verified structured median reduction | **58.14%** |
+| Fresh host encode mean | **1.407 ms** |
+| Fresh host decode mean | **1.537 ms** |
+| Max host RSS delta in fresh rerun | **64 KB** |
+| MCU SDK targets represented in build artifacts | **Cortex-M0/M0+, M3, M4, M4F** |
 
-- smart metering and utility telemetry
-- industrial and embedded devices
-- GNSS and positioning payloads
-- edge infrastructure
-- constrained links and low-bandwidth transports
+Fresh host reruns were executed on **Darwin 25.5.0 arm64**, with **30 measured runs after 5 warmups** per encode/decode command. Host timing is not MCU cycle timing.
 
-The design goal is simple: reduce structured payload size while preserving exact reconstruction and predictable runtime behavior.
+## Benchmark visuals
 
-## Engineering properties
+### Verified structured reduction by device
 
-- **Lossless** — decoded output is verified against the original payload.
-- **Deterministic** — the same input produces the same encoded representation and the same decoded output.
-- **Stream-safe** — supports concatenated multi-frame payloads.
-- **No training phase** — no model training is required before deployment.
-- **No external dictionary dependency** — integration does not rely on remotely managed dictionaries.
-- **Bounded implementation model** — designed for predictable memory use and embedded integration.
+![ZNano verified structured reduction](assets/znano-verified-reduction.svg)
 
-## Public benchmark set
+### Verified host throughput by device
 
-The public repository currently documents validation on four production-like device families:
+![ZNano verified host throughput](assets/znano-verified-throughput.svg)
 
-| Device | Domain | Payload | Result |
-|---|---|---|---|
-| HYDRUS-F06-006-WATER | Water metering | Structured telemetry | ~31% reduction |
-| LANDIS+GYR E450 | Electricity metering | Structured telemetry | See report |
-| NEO-M8-FW3 | GNSS / positioning | GNSS telemetry | See report |
-| SHARKY-775-159 | Thermal energy metering | Heat-meter telemetry | See report |
+### Validation coverage
 
-Detailed reports:
+![ZNano validation coverage](assets/znano-validation-coverage.svg)
 
-- [HYDRUS-F06-006-WATER](BENCHMARKS_HYDRUS_F06_006_WATER.md)
-- [LANDIS+GYR E450](BENCHMARKS_LANDIS_GYR_E450.md)
-- [NEO-M8-FW3](BENCHMARKS_NEO_M8_FW3.md)
-- [SHARKY-775-159](BENCHMARKS_SHARKY_775_159.md)
+### MCU footprint snapshot
 
-## Benchmark methodology
+![ZNano MCU footprint](assets/znano-mcu-footprint.svg)
 
-Across the published device tests, the methodology focuses on integration safety rather than synthetic compression contests:
+## Devices represented in the public evidence set
 
-1. use production-like structured payloads;
-2. encode the complete stream;
-3. decode the complete stream;
-4. verify normalized output integrity with SHA-256;
-5. measure repeated runtime after warm-up;
-6. inspect peak memory behavior and baseline overhead;
-7. report limitations alongside positive results.
+| Device | Domain | Public benchmark evidence |
+|---|---|---|
+| **HYDRUS-F06-006-WATER** | Water metering | Structured telemetry, multi-frame streams |
+| **LANDIS+GYR E450** | Electricity metering | Structured telemetry, multi-frame streams |
+| **NEO-M8-FW3** | GNSS / positioning | GNSS telemetry, multi-frame streams |
+| **SHARKY-775-159** | Thermal energy metering | Heat-meter telemetry, multi-frame streams |
 
-The published tests intentionally do **not** claim cycle-accurate MCU performance. Final cycle counts and memory requirements must be validated on the intended target hardware.
+Detailed legacy reports remain available in this repository, while the current consolidated rerun and publication guardrails live in [`docs/`](docs/).
 
-## Example: HYDRUS validation
+## What is verified today
 
-The HYDRUS-F06-006-WATER benchmark demonstrates:
+- **Lossless round-trip** on the 10 structured rerun rows whose normalized decoded output matches the input SHA-256.
+- **Lossless round-trip** on all 4 deterministic incompressible control cases in the fresh rerun.
+- **Concatenated multi-frame processing** with 6, 10, 20, and 40-frame cases depending on dataset.
+- **Decode-all stream mode** using `d 0` in the benchmark path.
+- **Host timing and RSS behavior** for the current CLI benchmark binary.
+- **SDK build artifacts and footprint measurements** for Cortex-M0/M0+, Cortex-M3, Cortex-M4 soft-float, and Cortex-M4F hard-float.
+- The optimized MCU SDK implementation path is documented as using **fixed internal buffers and no dynamic allocation**; this statement does not apply to every historical/legacy source path.
 
-- complete lossless stream reconstruction;
-- SHA-256 integrity match;
-- approximately 31% size reduction on the tested payload;
-- low runtime variance in the host benchmark environment;
-- bounded memory behavior in the tested implementation.
+## Important engineering boundaries
 
-See the [full HYDRUS report](BENCHMARKS_HYDRUS_F06_006_WATER.md) for methodology and interpretation.
+ZNano's public documentation deliberately distinguishes between **measured**, **calculated**, and **estimated / target-dependent** metrics.
+
+- Seven structured rerun rows report a decoded SHA-256 mismatch. Their compression figures are preserved for engineering investigation but are **excluded from strong public lossless claims**.
+- Incompressible pseudo-random payloads round-trip correctly in the fresh rerun but can **expand**. Applications that require a strict “never larger than input” transport guarantee need an explicit wrapper/bypass policy.
+- Host CLI timing is **not** MCU runtime performance.
+- Host RSS delta is **not** direct MCU RAM measurement.
+- Static stack figures are profile artifacts, **not runtime peak stack measurements**.
+- Bit-identical repeated encoded output has not yet been explicitly logged, so this repository does not use that as a public determinism claim.
+
+## MCU footprint snapshot
+
+Measured rebuilt SDK archive totals:
+
+| Target | Global encode + decode | Encode only | Decode only |
+|---|---:|---:|---:|
+| Cortex-M0/M0+ | 3295 B | 1603 B | 1039 B |
+| Cortex-M3 | 3201 B | 1567 B | 1019 B |
+| Cortex-M4 soft-float | 3205 B | 1567 B | 1023 B |
+| Cortex-M4F hard-float | 3213 B | 1567 B | 1023 B |
+
+Static profile harness values reported for the current evidence set:
+
+| CPU | Flash approx | Static RAM approx | Max single-function stack |
+|---|---:|---:|---:|
+| Cortex-M0 | 2835 B | 428 B | 80 B |
+| Cortex-M3 | 2459 B | 428 B | 56 B |
+| Cortex-M4 | 2483 B | 428 B | 56 B |
+
+These values describe the profiled build/harness and exclude caller-owned integration buffers where applicable.
 
 ## Integration model
 
-ZNano is intended to sit close to the source of structured data:
-
-```text
-Device / Sensor
-      |
-      v
-+-------------+
-| ZNano Encode|
-+-------------+
-      |
-      v
-Transport / Storage
-      |
-      v
-+-------------+
-| ZNano Decode|
-+-------------+
-      |
-      v
-Original Payload
+```mermaid
+flowchart LR
+    A[Structured telemetry frames] --> B[ZNano encode]
+    B --> C[Compressed stream]
+    C --> D[Radio / network / storage]
+    D --> E[ZNano decode]
+    E --> F[Restored original stream]
+    F --> G[Application parser / integrity check]
 ```
 
-The codec core is proprietary. Customer and evaluation releases are distributed separately from this public repository.
+For the integration contract, evidence classification, CLI behavior, and embedded SDK model, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
-## What is public vs. private
+## Documentation
 
-**Public here**
+- [`docs/BENCHMARKS_2026-08-15.md`](docs/BENCHMARKS_2026-08-15.md) — fresh rerun results and aggregate metrics
+- [`docs/PUBLIC_CLAIMS.md`](docs/PUBLIC_CLAIMS.md) — claims that are currently supportable and claims to avoid
+- [`docs/MCU_PROFILE.md`](docs/MCU_PROFILE.md) — target builds, footprint, RAM/stack interpretation, and QEMU functional evidence
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — public integration and evidence model
 
-- benchmark methodology
-- benchmark reports
-- integration-oriented technical documentation
-- product behavior and engineering claims that can be externally reviewed
+## Public vs. private
 
-**Private**
+**Public in this repository**
 
-- compression core source code
-- release binaries
-- internal test harnesses and proprietary datasets
+- benchmark methodology and evidence
+- publication-safe metrics
+- charts and architecture diagrams
+- integration-oriented documentation
+- known limitations and validation boundaries
+
+**Private / controlled distribution**
+
+- proprietary compression core source
+- protected release binaries and SDK releases
+- internal test harnesses and sensitive datasets
 - customer-specific integrations
 - release engineering and CI/CD
-
-## Product naming
-
-**ZNano** is the current product name. Earlier internal and benchmark material may refer to **NanoV3**; those references describe the same technology lineage.
 
 ## Commercial evaluation
 
 For technical evaluation, licensing, or integration discussions:
 
-**Zetako S.à r.l.**  
-Luxembourg  
-https://zetako.ai/  
-contact@zetako.ai
+**Zetako S.à r.l. — Luxembourg**  
+**https://zetako.ai/**  
+**contact@zetako.ai**
 
 ---
 
