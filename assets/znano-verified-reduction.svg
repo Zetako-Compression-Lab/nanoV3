@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420">
+<style>text{font-family:Arial,sans-serif;fill:#111}.title{font-size:22px;font-weight:700}.sub{font-size:12px;fill:#444}.axis{stroke:#555;stroke-width:1}.grid{stroke:#ddd;stroke-width:1}.bar{fill:#5b7cfa}.label{font-size:13px}.value{font-size:14px;font-weight:700}</style>
+<text class="title" x="80" y="28">ZNano verified structured reduction by device</text>
+<text class="sub" x="80" y="46">Mean reduction from SHA-verified rerun rows only — 2026-08-15</text>
+<line class="grid" x1="80" y1="350" x2="860" y2="350"/><text class="label" x="70" y="354" text-anchor="end">0%</text>
+<line class="grid" x1="80" y1="290" x2="860" y2="290"/><text class="label" x="70" y="294" text-anchor="end">20%</text>
+<line class="grid" x1="80" y1="230" x2="860" y2="230"/><text class="label" x="70" y="234" text-anchor="end">40%</text>
+<line class="grid" x1="80" y1="170" x2="860" y2="170"/><text class="label" x="70" y="174" text-anchor="end">60%</text>
+<line class="grid" x1="80" y1="110" x2="860" y2="110"/><text class="label" x="70" y="114" text-anchor="end">80%</text>
+<line class="grid" x1="80" y1="50" x2="860" y2="50"/><text class="label" x="70" y="54" text-anchor="end">100%</text>
+<line class="axis" x1="80" y1="50" x2="80" y2="350"/><line class="axis" x1="80" y1="350" x2="860" y2="350"/>
+<rect class="bar" x="148" y="176.87" width="110" height="173.13" rx="8"/><text class="value" x="203" y="168.87" text-anchor="middle">57.7%</text><text class="label" x="203" y="372" text-anchor="middle">HYDRUS</text>
+<rect class="bar" x="326" y="159.35" width="110" height="190.65" rx="8"/><text class="value" x="381" y="151.35" text-anchor="middle">63.5%</text><text class="label" x="381" y="372" text-anchor="middle">LANDIS+GYR</text>
+<rect class="bar" x="504" y="210.62" width="110" height="139.38" rx="8"/><text class="value" x="559" y="202.62" text-anchor="middle">46.5%</text><text class="label" x="559" y="372" text-anchor="middle">NEO-M8</text>
+<rect class="bar" x="682" y="186.17" width="110" height="163.83" rx="8"/><text class="value" x="737" y="178.17" text-anchor="middle">54.6%</text><text class="label" x="737" y="372" text-anchor="middle">SHARKY</text>
+</svg>

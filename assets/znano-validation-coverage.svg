@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="320" viewBox="0 0 900 320">
+<style>text{font-family:Arial,sans-serif;fill:#111}.title{font-size:22px;font-weight:700}.sub{font-size:12px;fill:#444}.label{font-size:13px}.value{font-size:13px;font-weight:700}</style>
+<text class="title" x="60" y="34">ZNano validation coverage — fresh rerun</text><text class="sub" x="60" y="52">21 total rows: 17 structured telemetry rows and 4 incompressible control rows</text>
+<rect x="60" y="110" width="361.9" height="42" fill="#3fb37f" rx="6"/><text class="value" x="241" y="136" text-anchor="middle" fill="#fff">10</text>
+<rect x="421.9" y="110" width="253.3" height="42" fill="#f4a259" rx="6"/><text class="value" x="548.6" y="136" text-anchor="middle" fill="#fff">7</text>
+<rect x="675.2" y="110" width="144.8" height="42" fill="#5b7cfa" rx="6"/><text class="value" x="747.6" y="136" text-anchor="middle" fill="#fff">4</text>
+<rect x="60" y="200" width="18" height="18" rx="3" fill="#3fb37f"/><text class="label" x="88" y="214">Structured SHA-verified: 10</text>
+<rect x="325" y="200" width="18" height="18" rx="3" fill="#f4a259"/><text class="label" x="353" y="214">Structured SHA mismatch: 7</text>
+<rect x="600" y="200" width="18" height="18" rx="3" fill="#5b7cfa"/><text class="label" x="628" y="214">Incompressible verified: 4</text>
+</svg>
