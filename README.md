@@ -51,6 +51,23 @@ Fresh host reruns were executed on **Darwin 25.5.0 arm64**, with **30 measured r
 
 Detailed legacy reports remain available in this repository, while the current consolidated rerun and publication guardrails live in [`docs/`](docs/).
 
+## Technology lineage: Ripple → ZNano
+
+ZNano's origins predate the current device-agnostic benchmark suite.
+
+An early generation of the technology was developed as a **customer-specific gas-meter telemetry POC for Ripple Metering**. That codec was designed around one known metering workload and was successfully integrated into the target environment.
+
+The research that followed focused on a larger question: whether the principles proven on that specific workload could evolve into a reusable lossless codec that was no longer dependent on one customer, one meter, or one fixed telemetry format.
+
+That transition — from **custom metering codec** to **device-agnostic structured-telemetry compression** — is the core technology lineage that led to ZNano.
+
+The preserved Ripple real-data regression set still provides useful historical evidence: two functioning ZHex-lineage implementations complete **5/5 valid round-trips** on the five real/realtime cases, with **63.48% average reduction** on that historical dataset.
+
+- [`docs/RIPPLE_TO_ZNANO.md`](docs/RIPPLE_TO_ZNANO.md) — historical POC and evolution from customer-specific to device-agnostic compression
+- [`docs/RIPPLE_ZHEX_LEGACY_BENCHMARK.md`](docs/RIPPLE_ZHEX_LEGACY_BENCHMARK.md) — real-data historical regression results
+
+The public history intentionally documents outcomes and engineering evolution without disclosing the proprietary compression mechanism.
+
 ## What is verified today
 
 - **Lossless round-trip** on the 10 structured rerun rows whose normalized decoded output matches the input SHA-256.
@@ -110,6 +127,8 @@ For the integration contract, evidence classification, CLI behavior, and embedde
 ## Documentation
 
 - [`docs/BENCHMARKS_2026-08-15.md`](docs/BENCHMARKS_2026-08-15.md) — fresh rerun results and aggregate metrics
+- [`docs/RIPPLE_TO_ZNANO.md`](docs/RIPPLE_TO_ZNANO.md) — origins in the Ripple gas-meter telemetry POC and evolution toward the current device-agnostic model
+- [`docs/RIPPLE_ZHEX_LEGACY_BENCHMARK.md`](docs/RIPPLE_ZHEX_LEGACY_BENCHMARK.md) — historical real-data Ripple regression benchmark
 - [`docs/PUBLIC_CLAIMS.md`](docs/PUBLIC_CLAIMS.md) — claims that are currently supportable and claims to avoid
 - [`docs/MCU_PROFILE.md`](docs/MCU_PROFILE.md) — target builds, footprint, RAM/stack interpretation, and QEMU functional evidence
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — public integration and evidence model
@@ -123,6 +142,7 @@ For the integration contract, evidence classification, CLI behavior, and embedde
 - charts and architecture diagrams
 - integration-oriented documentation
 - known limitations and validation boundaries
+- technology-lineage documentation that does not expose the proprietary codec mechanism
 
 **Private / controlled distribution**
 
