@@ -51,7 +51,7 @@ Fresh host reruns were executed on **Darwin 25.5.0 arm64**, with **30 measured r
 | **NEO-M8-FW3** | GNSS / positioning | GNSS telemetry, multi-frame streams |
 | **SHARKY-775-159** | Thermal energy metering | Heat-meter telemetry, multi-frame streams |
 
-Detailed legacy reports remain available in this repository, while the current consolidated rerun and publication guardrails live in [`docs/`](docs/).
+Current benchmark evidence and publication guardrails live under [`docs/`](docs/). Obsolete root-level benchmark narratives have been removed from the current branch to avoid mixing historical placeholders with the measured evidence set.
 
 ## Technology lineage: Ripple → ZNano
 
