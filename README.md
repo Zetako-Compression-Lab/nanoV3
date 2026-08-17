@@ -22,6 +22,8 @@ ZNano is built for structured device payloads where exact reconstruction, small 
 
 Fresh host reruns were executed on **Darwin 25.5.0 arm64**, with **30 measured runs after 5 warmups** per encode/decode command. Host timing is not MCU cycle timing.
 
+> **Benchmark refresh in progress:** the current public figures above are preserved from the last completed rerun until the expanded matrix and current binary are fully re-measured. New integration capabilities documented below are not used to rewrite historical benchmark values.
+
 ## Benchmark visuals
 
 ### Verified structured reduction by device
@@ -78,16 +80,42 @@ The public history intentionally documents outcomes and engineering evolution wi
 - **SDK build artifacts and footprint measurements** for Cortex-M0/M0+, Cortex-M3, Cortex-M4 soft-float, and Cortex-M4F hard-float.
 - The optimized MCU SDK implementation path is documented as using **fixed internal buffers and no dynamic allocation**; this statement does not apply to every historical/legacy source path.
 
+## Random-access decoding
+
+ZNano supports **random-access decoding** within a multi-frame compressed stream: an application can request one frame without first reconstructing every frame that precedes it.
+
+Practical uses include:
+
+- extracting one meter reading from a stored compressed batch;
+- re-reading or retransmitting one frame from an addressable device log;
+- decoding into a single-frame output buffer instead of rebuilding the complete stream.
+
+Random access is an addressing capability, not a loss-tolerance feature. The compressed stream must be available in randomly readable storage or already buffered before selective decoding is requested.
+
+Dedicated selective-decode timing and working-memory measurements will be added to the benchmark set after the current rerun is complete.
+
+## Payload scrambling
+
+ZNano provides an optional **payload scrambling** mode for the encoded representation. The transformation is deterministic and reversible, and the information required for reversal travels with the stream.
+
+Typical reasons to enable it are reducing immediately visible repeated value patterns and making compressed payloads less readable during casual inspection.
+
+**Scrambling is not encryption.** It provides no confidentiality, integrity, authentication, privacy, or compliance guarantee. It does not alter radio modulation, improve link budget or range, or provide error correction.
+
+The current integration contract adds **one byte of stream overhead** when scrambling is enabled. Timing impact will be published from measured reruns rather than estimated.
+
 ## Important engineering boundaries
 
 ZNano's public documentation deliberately distinguishes between **measured**, **calculated**, and **estimated / target-dependent** metrics.
 
-- Seven structured rerun rows report a decoded SHA-256 mismatch. Their compression figures are preserved for engineering investigation but are **excluded from strong public lossless claims**.
+- Seven structured rerun rows report a decoded SHA-256 mismatch. Their compression figures are preserved for engineering investigation but are **excluded from strong public lossless claims** until the expanded rerun replaces the historical evidence set.
 - Incompressible pseudo-random payloads round-trip correctly in the fresh rerun but can **expand**. Applications that require a strict “never larger than input” transport guarantee need an explicit wrapper/bypass policy.
 - Host CLI timing is **not** MCU runtime performance.
 - Host RSS delta is **not** direct MCU RAM measurement.
 - Static stack figures are profile artifacts, **not runtime peak stack measurements**.
 - Bit-identical repeated encoded output has not yet been explicitly logged, so this repository does not use that as a public determinism claim.
+- Payload scrambling is **not a security control**.
+- Random access does **not** imply independent corruption containment or packet-loss resilience.
 
 ## MCU footprint snapshot
 
@@ -122,11 +150,11 @@ flowchart LR
     F --> G[Application parser / integrity check]
 ```
 
-For the integration contract, evidence classification, CLI behavior, and embedded SDK model, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+For random access, scrambling, size limits, evidence classification, CLI behavior, and the embedded SDK model, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Documentation
 
-- [`docs/BENCHMARKS_2026-08-15.md`](docs/BENCHMARKS_2026-08-15.md) — fresh rerun results and aggregate metrics
+- [`docs/BENCHMARKS_2026-08-15.md`](docs/BENCHMARKS_2026-08-15.md) — last completed host rerun; will be replaced when the expanded current rerun is complete
 - [`docs/RIPPLE_TO_ZNANO.md`](docs/RIPPLE_TO_ZNANO.md) — origins in the Ripple gas-meter telemetry POC and evolution toward the current device-agnostic model
 - [`docs/RIPPLE_ZHEX_LEGACY_BENCHMARK.md`](docs/RIPPLE_ZHEX_LEGACY_BENCHMARK.md) — historical real-data Ripple regression benchmark
 - [`docs/PUBLIC_CLAIMS.md`](docs/PUBLIC_CLAIMS.md) — claims that are currently supportable and claims to avoid
